@@ -29,12 +29,14 @@ void main(void)
   vec3 b = vec3(-n.z, 0.0, n.x);                    // 従接線ベクトル (n × (0, 1, 0))
   vec3 t = normalize(cross(n, b));                  // 接線ベクトル (n × b)
 
-  float rd = dot(nn, nl);
-  float rs = dot(nr, nv);
-
+  vec3 nt = normalize(t);                           // 接線ベクトル
+  
+  // Kajiya-Kay
+  float lt = dot(nl, nt);
+  float vt = dot(nv, nt);
   vec4 iamb = kamb * lamb;
-  vec4 idiff = max(rd, 0.0) * kdiff * ldiff;
-  vec4 ispec = pow(max(rs, 0.0), kshi) * kspec * lspec;
+  vec4 idiff = sqrt(1 - lt * lt) * kdiff * ldiff;
+  vec4 ispec = pow(max(sqrt(1 - lt * lt) * sqrt(1 - vt * vt) - lt * vt, 0.0), kshi) * kspec * lspec;
 
   fc = iamb + idiff + ispec;
 }
